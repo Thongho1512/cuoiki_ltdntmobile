@@ -10,4 +10,5 @@ class AppConstants {
   static const String homeRoute = '/home';
   static const String auctionDetailRoute = '/auction-detail';
   static const String profileRoute = '/profile';
+  static const String createAuctionRoute = '/create-auction';
 }

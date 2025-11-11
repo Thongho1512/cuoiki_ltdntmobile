@@ -12,6 +12,7 @@ import 'features/auction/presentation/bloc/auction_detail/auction_detail_bloc.da
 import 'features/auction/presentation/bloc/auction_list/auction_list_bloc.dart';
 import 'features/auction/presentation/pages/auction_detail_page.dart';
 import 'features/auction/presentation/pages/auction_list_page.dart';
+import 'features/auction/presentation/pages/create_auction_page.dart'; // THÊM DÒNG NÀY
 import 'features/splash/splash_page.dart';
 import 'firebase_options.dart';
 import 'injection_container.dart' as di;
@@ -69,6 +70,12 @@ class MyApp extends StatelessWidget {
 
             case AppConstants.profileRoute:
               return MaterialPageRoute(builder: (_) => const ProfilePage());
+
+            // THÊM ROUTE MỚI
+            case AppConstants.createAuctionRoute:
+              return MaterialPageRoute(
+                builder: (_) => const CreateAuctionPage(),
+              );
 
             default:
               return MaterialPageRoute(builder: (_) => const SplashPage());

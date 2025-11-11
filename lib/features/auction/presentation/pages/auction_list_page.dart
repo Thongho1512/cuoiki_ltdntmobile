@@ -35,6 +35,14 @@ class _AuctionListPageState extends State<AuctionListPage> {
           ),
         ],
       ),
+      // THÊM FLOATING ACTION BUTTON
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          Navigator.of(context).pushNamed(AppConstants.createAuctionRoute);
+        },
+        icon: const Icon(Icons.add),
+        label: const Text('Tạo đấu giá'),
+      ),
       body: BlocBuilder<AuctionListBloc, AuctionListState>(
         builder: (context, state) {
           if (state is AuctionListLoading) {
@@ -79,6 +87,16 @@ class _AuctionListPageState extends State<AuctionListPage> {
                     Text(
                       'Chưa có sản phẩm đấu giá',
                       style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.of(
+                          context,
+                        ).pushNamed(AppConstants.createAuctionRoute);
+                      },
+                      icon: const Icon(Icons.add),
+                      label: const Text('Tạo đấu giá đầu tiên'),
                     ),
                   ],
                 ),
