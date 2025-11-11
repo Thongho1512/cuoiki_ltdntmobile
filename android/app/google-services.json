@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "36617989897",
+    "project_id": "cuoiky-e453c",
+    "storage_bucket": "cuoiky-e453c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:36617989897:android:5772bac8a2a6ebe1512dd8",
+        "android_client_info": {
+          "package_name": "com.example.appcuoikimobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBiukUpdEjBhbq9unJt0WHRGa4dIRlgRCI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
