@@ -193,7 +193,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
         return UserModel.fromJson(userDoc.data()!);
       } catch (e) {
-        print('Error in authStateChanges: $e');
+        // print('Error in authStateChanges: $e');
         return null;
       }
     });

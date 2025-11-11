@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class CustomTextField extends StatelessWidget {
   final TextEditingController controller;
@@ -6,6 +7,7 @@ class CustomTextField extends StatelessWidget {
   final String? hint;
   final bool obscureText;
   final TextInputType keyboardType;
+  final List<TextInputFormatter>? inputFormatters;
   final String? Function(String?)? validator;
   final Widget? prefixIcon;
   final Widget? suffixIcon;
@@ -18,6 +20,7 @@ class CustomTextField extends StatelessWidget {
     this.hint,
     this.obscureText = false,
     this.keyboardType = TextInputType.text,
+    this.inputFormatters,
     this.validator,
     this.prefixIcon,
     this.suffixIcon,
@@ -30,6 +33,7 @@ class CustomTextField extends StatelessWidget {
       controller: controller,
       obscureText: obscureText,
       keyboardType: keyboardType,
+      inputFormatters: inputFormatters,
       validator: validator,
       maxLines: maxLines,
       decoration: InputDecoration(
