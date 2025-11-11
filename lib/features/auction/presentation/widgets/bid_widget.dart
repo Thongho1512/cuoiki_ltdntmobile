@@ -10,11 +10,11 @@ class BidWidget extends StatefulWidget {
   final Function(int) onPlaceBid;
 
   const BidWidget({
-    Key? key,
+    super.key,
     required this.currentPrice,
     required this.isPlacingBid,
     required this.onPlaceBid,
-  }) : super(key: key);
+  });
 
   @override
   State<BidWidget> createState() => _BidWidgetState();
@@ -155,7 +155,7 @@ class _BidWidgetState extends State<BidWidget> {
         decoration: BoxDecoration(
           color: isSelected
               ? Theme.of(context).colorScheme.primary
-              : Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              : Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: Theme.of(context).colorScheme.primary,

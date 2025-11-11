@@ -6,7 +6,7 @@ import '../../domain/entities/bid_entity.dart';
 class BidHistoryWidget extends StatelessWidget {
   final List<BidEntity> bids;
 
-  const BidHistoryWidget({Key? key, required this.bids}) : super(key: key);
+  const BidHistoryWidget({super.key, required this.bids});
 
   @override
   Widget build(BuildContext context) {

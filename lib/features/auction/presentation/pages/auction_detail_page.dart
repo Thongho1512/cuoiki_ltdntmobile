@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../core/utils/date_formatter.dart';
 import '../../../../core/utils/price_formatter.dart';
-import '../../../../core/widgets/custom_button.dart';
 import '../../../../core/widgets/loading_widget.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_state.dart';
@@ -12,12 +10,12 @@ import '../bloc/auction_detail/auction_detail_state.dart';
 import '../widgets/bid_history_widget.dart';
 import '../widgets/bid_widget.dart';
 import '../widgets/countdown_timer_widget.dart';
+import '../../domain/entities/bid_entity.dart';
 
 class AuctionDetailPage extends StatefulWidget {
   final String auctionId;
 
-  const AuctionDetailPage({Key? key, required this.auctionId})
-    : super(key: key);
+  const AuctionDetailPage({super.key, required this.auctionId});
 
   @override
   State<AuctionDetailPage> createState() => _AuctionDetailPageState();
@@ -83,7 +81,7 @@ class _AuctionDetailPageState extends State<AuctionDetailPage> {
 
             final bidHistory = state is AuctionDetailLoaded
                 ? state.bidHistory
-                : [];
+                : <BidEntity>[];
 
             final isPlacingBid = state is AuctionDetailLoaded
                 ? state.isPlacingBid

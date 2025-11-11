@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../domain/entities/bid_entity.dart';
 import '../../../domain/usecases/get_bid_history_usecase.dart';
 import '../../../domain/usecases/place_bid_usecase.dart';
 import '../../../domain/usecases/watch_auction_usecase.dart';
@@ -56,9 +57,18 @@ class AuctionDetailBloc extends Bloc<AuctionDetailEvent, AuctionDetailState> {
 
     bidHistoryResult.fold(
       (failure) => emit(AuctionDetailLoaded(auction: event.auction)),
-      (bidHistory) => emit(
-        AuctionDetailLoaded(auction: event.auction, bidHistory: bidHistory),
-      ),
+      (bidHistory) {
+        // Fix: Cast to List<BidEntity> explicitly
+        final List<BidEntity> typedBidHistory = List<BidEntity>.from(
+          bidHistory,
+        );
+        emit(
+          AuctionDetailLoaded(
+            auction: event.auction,
+            bidHistory: typedBidHistory,
+          ),
+        );
+      },
     );
   }
 
