@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../domain/entities/auction_item_entity.dart';
 import '../../../domain/usecases/get_bid_history_usecase.dart';
 import '../../../domain/usecases/place_bid_usecase.dart';
 import '../../../domain/usecases/watch_auction_usecase.dart';
@@ -13,7 +12,6 @@ class AuctionDetailBloc extends Bloc<AuctionDetailEvent, AuctionDetailState> {
   final GetBidHistoryUseCase getBidHistoryUseCase;
 
   StreamSubscription? _auctionSubscription;
-  AuctionItemEntity? _currentAuction;
 
   AuctionDetailBloc({
     required this.watchAuctionUseCase,
@@ -54,8 +52,6 @@ class AuctionDetailBloc extends Bloc<AuctionDetailEvent, AuctionDetailState> {
     AuctionDetailUpdated event,
     Emitter<AuctionDetailState> emit,
   ) async {
-    _currentAuction = event.auction;
-
     final bidHistoryResult = await getBidHistoryUseCase(event.auction.id);
 
     bidHistoryResult.fold(

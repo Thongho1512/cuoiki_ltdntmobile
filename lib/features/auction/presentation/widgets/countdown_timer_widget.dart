@@ -1,12 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import '../../../../core/utils/date_formatter.dart';
 
 class CountdownTimerWidget extends StatefulWidget {
   final DateTime endTime;
 
-  const CountdownTimerWidget({Key? key, required this.endTime})
-    : super(key: key);
+  const CountdownTimerWidget({super.key, required this.endTime});
 
   @override
   State<CountdownTimerWidget> createState() => _CountdownTimerWidgetState();
@@ -65,7 +63,10 @@ class _CountdownTimerWidgetState extends State<CountdownTimerWidget> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: (isUrgent ? Colors.red : Colors.orange).withOpacity(0.3),
+            color: Color.alphaBlend(
+              (isUrgent ? Colors.red : Colors.orange).withAlpha(77),
+              Colors.white,
+            ),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -118,7 +119,10 @@ class _CountdownTimerWidgetState extends State<CountdownTimerWidget> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.2),
+            color: Color.alphaBlend(
+              Colors.white.withAlpha(51),
+              Colors.transparent,
+            ),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Text(

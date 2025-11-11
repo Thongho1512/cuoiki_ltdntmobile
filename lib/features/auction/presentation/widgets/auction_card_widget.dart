@@ -9,10 +9,10 @@ class AuctionCardWidget extends StatelessWidget {
   final VoidCallback onTap;
 
   const AuctionCardWidget({
-    Key? key,
+    super.key,
     required this.auction,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -135,9 +135,10 @@ class AuctionCardWidget extends StatelessWidget {
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.primary.withOpacity(0.1),
+                          color: Color.alphaBlend(
+                            Theme.of(context).colorScheme.primary.withAlpha(26),
+                            Colors.white,
+                          ),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Row(

@@ -2,15 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/widgets/loading_widget.dart';
-import '../../../auth/presentation/bloc/auth_bloc.dart';
-import '../../../auth/presentation/bloc/auth_state.dart';
 import '../bloc/auction_list/auction_list_bloc.dart';
 import '../bloc/auction_list/auction_list_event.dart';
 import '../bloc/auction_list/auction_list_state.dart';
 import '../widgets/auction_card_widget.dart';
 
 class AuctionListPage extends StatefulWidget {
-  const AuctionListPage({Key? key}) : super(key: key);
+  const AuctionListPage({super.key});
 
   @override
   State<AuctionListPage> createState() => _AuctionListPageState();
