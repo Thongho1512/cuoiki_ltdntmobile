@@ -39,6 +39,8 @@ class CustomTextField extends StatelessWidget {
       inputFormatters: inputFormatters,
       validator: validator,
       maxLines: maxLines,
+      // QUAN TRỌNG: Thêm dòng này để hỗ trợ tiếng Việt
+      enableIMEPersonalizedLearning: true,
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
