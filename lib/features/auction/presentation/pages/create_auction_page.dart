@@ -1,4 +1,3 @@
-// lib/features/auction/presentation/pages/create_auction_page.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -6,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/constants/firebase_constants.dart';
 import '../../../../core/widgets/custom_button.dart';
-import '../../../../core/widgets/custom_text_field.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_state.dart';
 
@@ -42,6 +40,7 @@ class _CreateAuctionPageState extends State<CreateAuctionPage> {
 
     final authState = context.read<AuthBloc>().state;
     if (authState is! AuthAuthenticated) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Vui lòng đăng nhập để tạo đấu giá'),
@@ -117,12 +116,18 @@ class _CreateAuctionPageState extends State<CreateAuctionPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Title
-              CustomTextField(
+              // Title - SỬ DỤNG TextField thay vì CustomTextField
+              TextFormField(
                 controller: _titleController,
-                label: 'Tên sản phẩm',
-                hint: 'VD: iPhone 14 Pro Max 256GB',
-                prefixIcon: const Icon(Icons.title),
+                decoration: InputDecoration(
+                  labelText: 'Tên sản phẩm',
+                  hintText: 'VD: iPhone 14 Pro Max 256GB',
+                  prefixIcon: const Icon(Icons.title),
+                ),
+                keyboardType: TextInputType.text,
+                textInputAction: TextInputAction.next,
+                autocorrect: false,
+                enableSuggestions: false,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Vui lòng nhập tên sản phẩm';
@@ -136,12 +141,19 @@ class _CreateAuctionPageState extends State<CreateAuctionPage> {
               const SizedBox(height: 16),
 
               // Description
-              CustomTextField(
+              TextFormField(
                 controller: _descriptionController,
-                label: 'Mô tả',
-                hint: 'Mô tả chi tiết về sản phẩm...',
+                decoration: InputDecoration(
+                  labelText: 'Mô tả',
+                  hintText: 'Mô tả chi tiết về sản phẩm...',
+                  prefixIcon: const Icon(Icons.description),
+                  alignLabelWithHint: true,
+                ),
                 maxLines: 4,
-                prefixIcon: const Icon(Icons.description),
+                keyboardType: TextInputType.multiline,
+                textInputAction: TextInputAction.newline,
+                autocorrect: false,
+                enableSuggestions: false,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Vui lòng nhập mô tả';
@@ -155,12 +167,15 @@ class _CreateAuctionPageState extends State<CreateAuctionPage> {
               const SizedBox(height: 16),
 
               // Image URL
-              CustomTextField(
+              TextFormField(
                 controller: _imageUrlController,
-                label: 'URL hình ảnh',
-                hint: 'https://example.com/image.jpg',
-                prefixIcon: const Icon(Icons.image),
+                decoration: InputDecoration(
+                  labelText: 'URL hình ảnh',
+                  hintText: 'https://example.com/image.jpg',
+                  prefixIcon: const Icon(Icons.image),
+                ),
                 keyboardType: TextInputType.url,
+                textInputAction: TextInputAction.next,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Vui lòng nhập URL hình ảnh';
@@ -174,12 +189,16 @@ class _CreateAuctionPageState extends State<CreateAuctionPage> {
               const SizedBox(height: 16),
 
               // Starting Price
-              CustomTextField(
+              TextFormField(
                 controller: _startingPriceController,
-                label: 'Giá khởi điểm',
-                hint: '1000000',
-                prefixIcon: const Icon(Icons.attach_money),
+                decoration: InputDecoration(
+                  labelText: 'Giá khởi điểm',
+                  hintText: '1000000',
+                  prefixIcon: const Icon(Icons.attach_money),
+                  suffixText: 'đ',
+                ),
                 keyboardType: TextInputType.number,
+                textInputAction: TextInputAction.next,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -195,12 +214,15 @@ class _CreateAuctionPageState extends State<CreateAuctionPage> {
               const SizedBox(height: 16),
 
               // Duration
-              CustomTextField(
+              TextFormField(
                 controller: _durationController,
-                label: 'Thời gian đấu giá (ngày)',
-                hint: '3',
-                prefixIcon: const Icon(Icons.calendar_today),
+                decoration: InputDecoration(
+                  labelText: 'Thời gian đấu giá (ngày)',
+                  hintText: '3',
+                  prefixIcon: const Icon(Icons.calendar_today),
+                ),
                 keyboardType: TextInputType.number,
+                textInputAction: TextInputAction.done,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 validator: (value) {
                   if (value == null || value.isEmpty) {
@@ -212,6 +234,7 @@ class _CreateAuctionPageState extends State<CreateAuctionPage> {
                   }
                   return null;
                 },
+                onChanged: (value) => setState(() {}),
               ),
               const SizedBox(height: 8),
               Text(
