@@ -1,10 +1,13 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../../../core/constants/firebase_constants.dart';
 import '../../../../core/widgets/custom_button.dart';
+import '../../../../core/services/cloudinary_service.dart'; // Import service
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_state.dart';
 
@@ -19,24 +22,96 @@ class _CreateAuctionPageState extends State<CreateAuctionPage> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
-  final _imageUrlController = TextEditingController();
   final _startingPriceController = TextEditingController();
   final _durationController = TextEditingController(text: '3');
 
+  final ImagePicker _picker = ImagePicker();
+  File? _selectedImage;
+  String? _uploadedImageUrl;
+
   bool _isCreating = false;
+  bool _isUploadingImage = false;
 
   @override
   void dispose() {
     _titleController.dispose();
     _descriptionController.dispose();
-    _imageUrlController.dispose();
     _startingPriceController.dispose();
     _durationController.dispose();
     super.dispose();
   }
 
+  Future<void> _pickImage() async {
+    try {
+      final XFile? image = await _picker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 1920,
+        maxHeight: 1080,
+        imageQuality: 85,
+      );
+
+      if (image != null) {
+        setState(() {
+          _selectedImage = File(image.path);
+          _uploadedImageUrl = null; // Reset URL khi chọn ảnh mới
+        });
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Lỗi chọn ảnh: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  Future<void> _uploadImageToCloudinary() async {
+    if (_selectedImage == null) return;
+
+    setState(() => _isUploadingImage = true);
+
+    try {
+      final imageUrl = await CloudinaryService.uploadImage(_selectedImage!);
+      setState(() {
+        _uploadedImageUrl = imageUrl;
+        _isUploadingImage = false;
+      });
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Upload ảnh thành công!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      setState(() => _isUploadingImage = false);
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Lỗi upload ảnh: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
   Future<void> _handleCreateAuction() async {
     if (!_formKey.currentState!.validate()) return;
+
+    // Kiểm tra phải có ảnh
+    if (_uploadedImageUrl == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Vui lòng chọn và upload ảnh sản phẩm'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
 
     final authState = context.read<AuthBloc>().state;
     if (authState is! AuthAuthenticated) {
@@ -61,7 +136,7 @@ class _CreateAuctionPageState extends State<CreateAuctionPage> {
       final auctionData = {
         'title': _titleController.text.trim(),
         'description': _descriptionController.text.trim(),
-        'imageUrl': _imageUrlController.text.trim(),
+        'imageUrl': _uploadedImageUrl!,
         'startingPrice': startingPrice,
         'currentPrice': startingPrice,
         'highestBidderId': null,
@@ -116,18 +191,101 @@ class _CreateAuctionPageState extends State<CreateAuctionPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Title - SỬ DỤNG TextField thay vì CustomTextField
+              // Image Picker Section
+              Container(
+                height: 200,
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey[400]!),
+                ),
+                child: _selectedImage != null
+                    ? Stack(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.file(
+                              _selectedImage!,
+                              width: double.infinity,
+                              height: 200,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          Positioned(
+                            top: 8,
+                            right: 8,
+                            child: IconButton(
+                              icon: const Icon(Icons.close, color: Colors.red),
+                              onPressed: () {
+                                setState(() {
+                                  _selectedImage = null;
+                                  _uploadedImageUrl = null;
+                                });
+                              },
+                              style: IconButton.styleFrom(
+                                backgroundColor: Colors.white,
+                              ),
+                            ),
+                          ),
+                          if (_uploadedImageUrl != null)
+                            const Positioned(
+                              bottom: 8,
+                              right: 8,
+                              child: Chip(
+                                label: Text('✓ Đã upload'),
+                                backgroundColor: Colors.green,
+                                labelStyle: TextStyle(color: Colors.white),
+                              ),
+                            ),
+                        ],
+                      )
+                    : InkWell(
+                        onTap: _pickImage,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.add_photo_alternate,
+                              size: 64,
+                              color: Colors.grey[600],
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'Chọn ảnh sản phẩm',
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                                fontSize: 16,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+              ),
+
+              if (_selectedImage != null && _uploadedImageUrl == null) ...[
+                const SizedBox(height: 16),
+                SizedBox(
+                  height: 48,
+                  child: CustomButton(
+                    text: 'Upload ảnh lên Cloud',
+                    onPressed: _uploadImageToCloudinary,
+                    isLoading: _isUploadingImage,
+                    backgroundColor: Colors.blue,
+                  ),
+                ),
+              ],
+
+              const SizedBox(height: 24),
+
+              // Title
               TextFormField(
                 controller: _titleController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Tên sản phẩm',
                   hintText: 'VD: iPhone 14 Pro Max 256GB',
-                  prefixIcon: const Icon(Icons.title),
+                  prefixIcon: Icon(Icons.title),
                 ),
-                keyboardType: TextInputType.text,
                 textInputAction: TextInputAction.next,
-                autocorrect: false,
-                enableSuggestions: false,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Vui lòng nhập tên sản phẩm';
@@ -143,17 +301,14 @@ class _CreateAuctionPageState extends State<CreateAuctionPage> {
               // Description
               TextFormField(
                 controller: _descriptionController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Mô tả',
                   hintText: 'Mô tả chi tiết về sản phẩm...',
-                  prefixIcon: const Icon(Icons.description),
+                  prefixIcon: Icon(Icons.description),
                   alignLabelWithHint: true,
                 ),
                 maxLines: 4,
-                keyboardType: TextInputType.multiline,
                 textInputAction: TextInputAction.newline,
-                autocorrect: false,
-                enableSuggestions: false,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Vui lòng nhập mô tả';
@@ -166,35 +321,13 @@ class _CreateAuctionPageState extends State<CreateAuctionPage> {
               ),
               const SizedBox(height: 16),
 
-              // Image URL
-              TextFormField(
-                controller: _imageUrlController,
-                decoration: InputDecoration(
-                  labelText: 'URL hình ảnh',
-                  hintText: 'https://example.com/image.jpg',
-                  prefixIcon: const Icon(Icons.image),
-                ),
-                keyboardType: TextInputType.url,
-                textInputAction: TextInputAction.next,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Vui lòng nhập URL hình ảnh';
-                  }
-                  if (!value.startsWith('http')) {
-                    return 'URL không hợp lệ';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-
               // Starting Price
               TextFormField(
                 controller: _startingPriceController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Giá khởi điểm',
                   hintText: '1000000',
-                  prefixIcon: const Icon(Icons.attach_money),
+                  prefixIcon: Icon(Icons.attach_money),
                   suffixText: 'đ',
                 ),
                 keyboardType: TextInputType.number,
@@ -216,10 +349,10 @@ class _CreateAuctionPageState extends State<CreateAuctionPage> {
               // Duration
               TextFormField(
                 controller: _durationController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Thời gian đấu giá (ngày)',
                   hintText: '3',
-                  prefixIcon: const Icon(Icons.calendar_today),
+                  prefixIcon: Icon(Icons.calendar_today),
                 ),
                 keyboardType: TextInputType.number,
                 textInputAction: TextInputAction.done,
@@ -234,7 +367,6 @@ class _CreateAuctionPageState extends State<CreateAuctionPage> {
                   }
                   return null;
                 },
-                onChanged: (value) => setState(() {}),
               ),
               const SizedBox(height: 8),
               Text(
@@ -244,7 +376,7 @@ class _CreateAuctionPageState extends State<CreateAuctionPage> {
 
               const SizedBox(height: 32),
 
-              // Preview info
+              // Info box
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -270,9 +402,10 @@ class _CreateAuctionPageState extends State<CreateAuctionPage> {
                     ),
                     const SizedBox(height: 8),
                     Text(
+                      '• Chọn ảnh rồi nhấn "Upload ảnh lên Cloud"\n'
+                      '• Ảnh sẽ được lưu trên Cloudinary (miễn phí)\n'
                       '• Sau khi tạo, đấu giá sẽ bắt đầu ngay lập tức\n'
-                      '• Không thể sửa giá khởi điểm sau khi có người đặt giá\n'
-                      '• Hãy đảm bảo thông tin chính xác trước khi tạo',
+                      '• Không thể sửa giá khởi điểm sau khi có người đặt giá',
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ],
