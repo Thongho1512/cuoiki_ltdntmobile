@@ -286,6 +286,7 @@ class _CreateAuctionPageState extends State<CreateAuctionPage> {
                   prefixIcon: Icon(Icons.title),
                 ),
                 textInputAction: TextInputAction.next,
+                enableIMEPersonalizedLearning: true,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Vui lòng nhập tên sản phẩm';
@@ -309,6 +310,7 @@ class _CreateAuctionPageState extends State<CreateAuctionPage> {
                 ),
                 maxLines: 4,
                 textInputAction: TextInputAction.newline,
+                enableIMEPersonalizedLearning: true,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Vui lòng nhập mô tả';
